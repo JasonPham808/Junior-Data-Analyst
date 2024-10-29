@@ -1,1 +1,2 @@
-# Junior-Data-Analyst
+# Jason Pham Junior-Data-Analyst portfolio
+## About me
