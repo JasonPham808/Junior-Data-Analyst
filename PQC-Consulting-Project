@@ -1,1 +1,220 @@
-$gitadd.https://colab.research.google.com/drive/1ygHjGig3_vK5MWtnNJhkeKi1V5uhLG9Z?usp=sharing
+#H1 1. Business understandings, problem, solution and recommendations
+Business Understanding and Problem: Play Quest Conquer (PQC) seeks to understand the factors influencing game ratings to inform game development, acquisition, and promotion strategies. The primary business problem is identifying which features, such as game complexity, interest levels, and player engagement, most significantly impact ratings.
+Aim: The aim of this project is to develop a predictive model that accurately estimates game ratings based on these features, providing actionable insights to optimize PQC’s game portfolio and enhance user satisfaction.
+Solution: A multiple linear regression model was developed to identify key predictors of game ratings. Despite explaining only a portion of the variance, the model highlights significant factors like Average_Complexity and Game_Type.
+Recommendations: To improve predictive accuracy, consider enhancing the model with interaction terms and exploring non-linear relationships. Regularly update the model with new data to adapt to changing player preferences and ensure continued relevance in decision-making.
+#H2 2. Data understanding, preparation, explorations and visualisation
+'# Load requires libraries
+import pandas as pd #for data manipulation and analysis
+import numpy as np #for working with arrays
+#import data visualisation libraries
+import matplotlib.pyplot as plt
+import seaborn as sns
+# Load data from CloudDeakin'
+#H3 2.1 Load dataset
+from google.colab import drive
+drive.mount('/content/drive')
+# load dataset stored in Google drive
+dataset = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/MIS710 ASM 1/PQC_data (3).csv")
+#H3 2.2 General Information and Game Configuration
+'#Display info of the dataset
+print(dataset.info())
+#View the dataframe shape
+print("\n* Dataset shape: ", dataset.shape)'
+'print("General Information and Game Configuration:")
+# Game types
+if 'Game_Type' in dataset.columns: # Use 'dataset' instead of 'data'
+    game_types = dataset['Game_Type'].value_counts()
+    print("\nGame Types:\n", game_types)
+else:
+    print("\n'Game_Type' column not found in the dataset.")
+# Year of release
+if 'Released_Year' in dataset.columns: # Use 'dataset' instead of 'data'
+    years = dataset['Released_Year'].value_counts().sort_index()
+    print("\nYear of Release (Categorized):\n", years)
+else:
+    print("\n'Released_year' column not found in the dataset.")
+# Age category
+if 'Age_Category' in dataset.columns: # Use 'dataset' instead of 'data'
+    age_categories = dataset['Age_Category'].value_counts()
+    print("\nAge Category:\n", age_categories)
+else:
+    print("\n'Age_Category' column not found in the dataset.")
+# Minimum number of players
+if 'Min_Players' in dataset.columns: # Use 'dataset' instead of 'data'
+    min_players = dataset['Min_Players'].value_counts().sort_index()
+    print("\nMinimum Number of Players Required:\n", min_players)
+else:
+    print("\n'Min_Players' column not found in the dataset.")
+# Maximum number of players
+if 'Max_Players' in dataset.columns: # Use 'dataset' instead of 'data'
+    max_players = dataset['Max_Players'].value_counts().sort_index()
+    print("\nMaximum Number of Players Allowed:\n", max_players)
+else:
+    print("\n'Max_Players' column not found in the dataset.")
+# Average complexity
+if 'Average_Complexity' in dataset.columns:
+    avg_complexity = dataset['Average_Complexity'].describe()
+    print("\nAverage Complexity:\n", avg_complexity)
+else:
+    print("\n'Average_Complexity' column not found in the dataset.")
+# Complexity raters
+if 'Complexity_Raters' in dataset.columns:
+    complexity_raters = dataset['Complexity_Raters'].describe()
+    print("\nComplexity Raters:\n", complexity_raters)
+else:
+    print("\n'Complexity_Raters' column not found in the dataset.")
+# Average play time
+if 'Average_Play_Time' in dataset.columns:
+    avg_play_time = dataset['Average_Play_Time'].describe()
+    print("\nAverage Play Time:\n", avg_play_time)
+else:
+    print("\n'Average_Play_Time' column not found in the dataset.")
+# Owner number
+if 'Owner_Number' in dataset.columns:
+    owner_number = dataset['Owner_Number'].describe()
+    print("\nOwner Number:\n", owner_number)
+else:
+    print("\n'Owner_Number' column not found in the dataset.")
+# Trader number
+if 'Trader_Number' in dataset.columns:
+    trader_number = dataset['Trader_Number'].describe()
+    print("\nTrader Number:\n", trader_number)
+else:
+    print("\n'Trader_Number' column not found in the dataset.")
+# High interest number
+if 'HighInterest_Number' in dataset.columns:
+    high_interest_number = dataset['HighInterest_Number'].describe()
+    print("\nHigh Interest Number:\n", high_interest_number)
+else:
+    print("\n'HighInterest_Number' column not found in the dataset.")
+# Interest number
+if 'Interest_Number' in dataset.columns:
+    interest_number = dataset['Interest_Number'].describe()
+    print("\nInterest Number:\n", interest_number)
+else:
+    print("\n'Interest_Number' column not found in the dataset.")
+# Average rating
+if 'Average_Rating' in dataset.columns:
+    avg_rating = dataset['Average_Rating'].describe()
+    print("\nAverage Rating:\n", avg_rating)
+else:
+    print("\n'Average_Rating' column not found in the dataset.")
+# Rater number
+if 'Rater_Number' in dataset.columns:
+    rater_number = dataset['Rater_Number'].describe()
+    print("\nRater Number:\n", rater_number)
+else:
+    print("\n'Rater_Number' column not found in the dataset.")
+# Comment number
+if 'Comment_Number' in dataset.columns:
+    comment_number = dataset['Comment_Number'].describe()
+    print("\nComment Number:\n", comment_number)
+else:
+    print("\n'Comment_Number' column not found in the dataset.")'
+'#overview of numeric data
+dataset.describe()'
+'#set the formatting for floating numbers
+pd.set_option('display.float_format', lambda x: '%.2f' % x)
+data_types =['object', 'float', 'int']
+dataset.describe(include=data_types)'
+#H1 Conduct Exploratory Data Analysis (EDA)
+'# 1. Game Types - Pie Chart
+plt.figure(figsize=(8, 8))
+game_types = dataset['Game_Type'].value_counts()
+plt.pie(game_types, labels=game_types.index, autopct='%1.1f%%', startangle=140)
+plt.title('Distribution of Game Types')
+plt.show()
+
+# 2. Year of Release - Bar Plot
+plt.figure(figsize=(12, 6))
+years = dataset['Released_Year'].value_counts().sort_index()
+sns.barplot(x=years.index, y=years.values, palette='viridis')
+plt.title('Number of Games Released by Year')
+plt.xlabel('Year of Release')
+plt.ylabel('Number of Games')
+plt.xticks(rotation=45)
+plt.show()
+
+# 3. Age Category - Bar Plot
+plt.figure(figsize=(10, 6))
+age_categories = dataset['Age_Category'].value_counts()
+sns.barplot(x=age_categories.index, y=age_categories.values, palette='muted')
+plt.title('Distribution of Games by Age Category')
+plt.xlabel('Age Category')
+plt.ylabel('Number of Games')
+plt.show()
+
+# 4. Minimum Number of Players - Bar Plot
+plt.figure(figsize=(10, 6))
+min_players = dataset['Min_Players'].value_counts().sort_index()
+sns.barplot(x=min_players.index, y=min_players.values, palette='deep')
+plt.title('Minimum Number of Players Required')
+plt.xlabel('Minimum Number of Players')
+plt.ylabel('Number of Games')
+plt.show()
+# 5. Maximum Number of Players - Bar Plot
+plt.figure(figsize=(12, 6))
+max_players = dataset['Max_Players'].value_counts().sort_index()
+sns.barplot(x=max_players.index, y=max_players.values, palette='dark')
+plt.title('Maximum Number of Players Allowed')
+plt.xlabel('Maximum Number of Players')
+plt.ylabel('Number of Games')
+plt.xticks(rotation=45)
+plt.show()'
+# 3.2 Game engagement: Summarise the average play time? Are there outliers?
+# Describe the 'Average_Play_Time' column
+print(dataset['Average_Play_Time'].describe())
+
+# Visualize the distribution of 'Average_Rating'
+sns.histplot(data=dataset, x='Average_Play_Time', kde=True, bins=50)
+plt.title('Histogram of Average Play Time')
+plt.xlabel('Average Play Time')
+plt.ylabel('Frequency')
+plt.show()
+#Visualise the distribution by box plot
+sns.boxplot(data=dataset, x='Average_Play_Time', showmeans=True)
+plt.title('Boxplot of Average Play Time')
+plt.xlabel('Average Play Time')
+plt.show()
+#H3 3.3 Game engagement and rating: Is there a relationship between the playing time and the average ratings?
+'import matplotlib.pyplot as plt
+import seaborn as sns
+# Set the figure size
+plt.figure(figsize=(10, 6))
+# Create a scatter plot with a regression line
+sns.regplot(data=dataset, x='Average_Play_Time', y='Average_Rating', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
+# Add labels and title
+plt.xlabel('Average Play Time (minutes)')
+plt.ylabel('Average Rating')
+plt.title('Relationship Between Average Play Time and Average Rating')
+# Show the plot
+plt.show()'
+#H3 3.4 Game complexity and rating
+'import matplotlib.pyplot as plt
+import seaborn as sns
+# Set the figure size
+plt.figure(figsize=(10, 6))
+# Create a scatter plot with a regression line
+sns.regplot(data=dataset, x='Average_Complexity', y='Average_Rating', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
+# Add labels and title
+plt.xlabel('Average Complexity')
+plt.ylabel('Average Rating')
+plt.title('Relationship Between Average Complexity and Average Rating')
+# Show the plot
+plt.show()'
+#H6 3.5 Correlation matrix between variables
+'# Calculate the correlation matrix
+correlation_matrix = dataset[numerical_variables].corr()
+# Generate the heatmap
+sns.heatmap(correlation_matrix,
+            square=True,
+            cmap='Blues',
+            annot=True,  fmt='.2f',  # Format for annotation text
+            linewidths=0.5,  # Add lines between cells
+            cbar_kws={'shrink': .8})  # Adjust colorbar size
+plt.title('Correlation Heatmap of Numerical Variables')
+plt.figure(figsize=(24,14))
+#generate dendrograms to show hierarchical clustering
+sns.clustermap(dataset[numerical_variables].corr(), cmap='Blues', annot=True, row_cluster=False)
+plt.show()'
